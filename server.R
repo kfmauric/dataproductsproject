@@ -4,15 +4,17 @@ library(jsonlite)
 library(ggplot2)
 library(DT)
 library(lubridate)
+library(dplyr)
 shinyServer(
   #grab and process initial data
   function(input, output, session) {
     #grab data from api and make location table
     #big grab upfront and then subset in R
-    jsonData <- fromJSON("http://api.civicapps.org/restaurant-inspections?count=1000&since=2000-12-27")
-    descPoint <- cbind(jsonData$results$location[c("Longitude", "Latitude")],
-                       jsonData$results[c("name", "inspection_number","restaurant_id","type","date","score")],
-                       jsonData$results$address[c("street", "city","zip")])
+    #jsonData <- fromJSON("http://api.civicapps.org/restaurant-inspections?count=1000&since=2000-12-27")
+    #descPoint <- cbind(jsonData$results$location[c("Longitude", "Latitude")],
+                       #jsonData$results[c("name", "inspection_number","restaurant_id","type","date","score")],
+                       #jsonData$results$address[c("street", "city","zip")])
+    source("data.Rdmpd")
     #fix the dates
     descPoint$date <- ymd(descPoint$date)
     #fix the score
@@ -41,16 +43,16 @@ shinyServer(
                                mdescPoint$name, mdescPoint$ave_score)
     output$table = DT::renderDataTable(rdescPoint<-dateNewData(), selection = 'single')
     output$foo = renderText(input$table_rows_selected)
-    update_server <- reactive({
-      input$fetch
-      browser()
-      jsonstring<-paste("http://api.civicapps.org/restaurant-inspections?count=1000&since=", input$date2, sep="")
-      jsonData <- fromJSON(as.character(jsonstring))
-      descPoint <- cbind(jsonData$results$location[,c("Longitude", "Latitude")],
-                       jsonData$results[c("name", "score")])
-      descPoint$content <- paste(sep = "<br/>",
-                               descPoint$name, descPoint$score)
-    })
+    #update_server <- reactive({
+     # input$fetch
+    #  browser()
+    #  jsonstring<-paste("http://api.civicapps.org/restaurant-inspections?count=1000&since=", input$date2, sep="")
+    #  jsonData <- fromJSON(as.character(jsonstring))
+    #  descPoint <- cbind(jsonData$results$location[,c("Longitude", "Latitude")],
+    #                   jsonData$results[c("name", "score")])
+    #  descPoint$content <- paste(sep = "<br/>",
+    #                           descPoint$name, descPoint$score)
+    #})
     #makeReactiveBinding("rdescPoint")
     #makeReactiveBinding("mdescPoint")
        output$startdate = renderText({
