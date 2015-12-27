@@ -17,19 +17,40 @@ shinyUI(fluidPage(
       span("RStudio", style = "color:blue")
     ),
     mainPanel(
-      h1("Introducing Shiny"),
-      p("Shiny is a new package from R studio that makes it", em("incredibly easy"), " to build interactive web application with R."),
-      br(),
-      p("For an introuction and live examples visit the",
-        a("Shiny homepage.",
-          href = "http://www.rstudio.com/shiny")),
-      br(),
-      h2("Features"),
-      p("*Build appplications with aonly a few linbes of code - no javasdcript required."),
-      p("*Shiny applications are automatically live in the same way that", strong("spreadsheets"), "are live. Outputs change instantly as users modify inputs, withoput requiring a reload of the browser."),
-      leafletOutput("mymap"),
-      p(),
-      actionButton("recalc", "New points")
+      fluidRow(
+        column(12,leafletOutput("mymap")),
+        column(1,
+               br()
+               )
+        ),
+      # Copy the line below to make a text input box
+      fluidRow(
+        column(6,
+               dateInput('date2',
+                         label = 'Start Date',
+                         value = as.character(Sys.Date()-365),
+                         min = Sys.Date() - 1825, max = Sys.Date(),
+                         format = "mm/dd/yy"
+                       ),
+               p("Current Values:", style = "color:#888888;"),
+               verbatimTextOutput("startdate")
+        ),
+        column(6,
+               actionButton("fetch", label = "Fetch Data"),
+               p("Current Values:", style = "color:#888888;"),
+               verbatimTextOutput("resName")
+               )
+      ),
+      fluidRow(
+        column(5,
+               verbatimTextOutput("foo")
+               )
+      ),
+      fluidRow(
+        column(12,
+               dataTableOutput(outputId="table")
+        )
+      )
     )
   )
 ))
